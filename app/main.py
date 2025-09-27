@@ -31,5 +31,4 @@ async def extract_pdf():
     pdf_path = '/Users/shamikbera/Documents/Projects/finance-advisor-rag/app/data/Millennia Credit Card Statement Sept 2025.pdf'
     result = document_extractor.extract_statement(pdf_path)
     print(result)
-    
-    
+    return None
