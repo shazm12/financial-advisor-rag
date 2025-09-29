@@ -140,9 +140,9 @@ class TableExtractionTool(BaseTool):
         
         merchant = description.split(',')[0].strip()
         
-        if txn_type == "DR":  # Debit/Expense
+        if txn_type == "DR":  # Debit else Credit
             return f"On {date}, spent ₹{amount} at {merchant}"
-        else:  # Credit/Income  
+        else:  
             return f"On {date}, received ₹{amount} from {merchant}"
 
     def _parse_credit_card_transaction(self, line):
