@@ -1,6 +1,7 @@
-# FastAPI and ASGI server
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-
-# Pydantic for data validation
-pydantic==2.5.0
+fastapi
+uvicorn
+redis==4.5.4
+langchain-community
+langchain-huggingface
+sentence-transformers
+python-dotenv
