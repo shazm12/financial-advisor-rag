@@ -7,7 +7,8 @@ class Retreiver:
     
     def set_retreiver(self, rds:Redis=None):
         self.rds = rds
-
-    def retreive_using_similarity(self, text: str):
-        retreiver = self.rds.as_retriever(search_type="similarity")
-        return retreiver.invoke(text)
+    
+    
+    def retreive_using_similarity(self):
+        retreiver = self.rds.as_retriever(search_type="similarity",search_kwargs={"k": 4})
+        return retreiver
