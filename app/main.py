@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from langchain_core.tools import retriever
-from app.models.response import ExtractionResponse, Status
+from app.models.request import QueryRequest
+from app.models.response import ExtractionResponse, QueryResponse, Status
+from app.utils.chains.query_chain import QueryChain
 from app.utils.create_embeddings import CreateEmbeddings
 from app.utils.document_extractor import DocumentExtractor
 from app.utils.redisdb import RedisDB
@@ -56,14 +57,40 @@ async def extract_pdf():
         trxn_rds = embedding.create_embeddings_for_transactions_data(
             transactions_data=transactions_data
         )
-        text_rds = embedding.create_embeddings_for_text_data(text_data=text_data)
+        text_rds = embedding.create_embeddings_for_text_data(
+            text_data=text_data, index_name="full_text_data"
+        )
         transactions_retreiver.set_retreiver(trxn_rds)
         full_text_retreiver.set_retreiver(text_rds)
-        resopnse = ExtractionResponse(status=Status.SUCCESS,description="Extraction Successful")
-        return resopnse
+        response = ExtractionResponse(
+            status=Status.SUCCESS, description="Extraction Successful"
+        )
+        return response
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(
-            status_code=200,
-            detail=ExtractionResponse(status=Status.FAILURE,description=f"{e}").model_dump_json()
+            status_code=400,
+            detail=ExtractionResponse(
+                status=Status.FAILURE, description=f"{e}"
+            ).model_dump(mode="json"),
+        )
+
+
+@app.post("/query")
+async def query(request: QueryRequest):
+    try:
+        query_chain = QueryChain(
+            transactions_retriever=transactions_retreiver,
+            full_text_retriever=full_text_retreiver,
+        )
+        answer = query_chain.invoke(request.prompt)
+        response = QueryResponse(status=Status.SUCCESS, response=answer)
+        return response
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=ExtractionResponse(
+                status=Status.FAILURE, description=f"{e}"
+            ).model_dump(mode="json"),
         )
