@@ -9,3 +9,7 @@ class Status(str, Enum):
 class ExtractionResponse(BaseModel):
     status: Status
     description: str
+    
+class QueryResponse(BaseModel):
+    status: Status
+    response: str
