@@ -33,7 +33,7 @@ class CreateEmbeddings:
         except Exception as e:
             print(f"Error Embedding and storing in vector DB: {e}")
 
-    def create_embeddings_for_text_data(self, text_data):
+    def create_embeddings_for_text_data(self, text_data, index_name):
         try:
 
             text_splitter = RecursiveCharacterTextSplitter(
@@ -53,7 +53,7 @@ class CreateEmbeddings:
                 texts=texts,
                 embedding=embeddings,
                 redis_url=REDIS_URL,
-                index_name=f"full_text_index",
+                index_name=f"{index_name}",
             )
             
             return rds

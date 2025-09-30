@@ -11,7 +11,7 @@ class RedisDB:
     def _connect(self):
         try:
             self.client = redis.from_url(self.redis_url, decode_responses=True)
-            print(f"✅ Connected to Redis at {self.redis_url}")
+            print(f"✅ Connected to Redis DB!")
         except Exception as e:
             print(f"❌ Failed to connect to Redis: {e}")
             raise
