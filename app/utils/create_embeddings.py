@@ -15,7 +15,7 @@ class CreateEmbeddings:
     def __init__(self):
         pass
 
-    def create_embeddings_for_transactions_data(self, transactions_data):
+    def create_embeddings_for_transactions_data(self, transactions_data, session_id):
         try:
             transaction_text_data = [
                 t["text"] for t in transactions_data if "text" in t
@@ -27,13 +27,13 @@ class CreateEmbeddings:
                 texts=transaction_text_data,
                 embedding=embeddings,
                 redis_url=REDIS_URL,
-                index_name="transactions_index",
+                index_name=f"transactions_index_{session_id}",
             )
             return rds
         except Exception as e:
             print(f"Error Embedding and storing in vector DB: {e}")
 
-    def create_embeddings_for_text_data(self, text_data, index_name):
+    def create_embeddings_for_text_data(self, text_data, index_name,session_id):
         try:
 
             text_splitter = RecursiveCharacterTextSplitter(
@@ -53,7 +53,7 @@ class CreateEmbeddings:
                 texts=texts,
                 embedding=embeddings,
                 redis_url=REDIS_URL,
-                index_name=f"{index_name}",
+                index_name=f"{index_name}_{session_id}",
             )
             
             return rds
