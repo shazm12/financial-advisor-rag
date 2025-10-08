@@ -1,10 +1,8 @@
 import os
 from langchain_community.vectorstores.redis import Redis
-from langchain_community.embeddings import HuggingFaceEmbeddings  # Fixed import
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
-import redis
-
 load_dotenv()
 
 REDIS_URL = os.getenv("REDIS_URL")
