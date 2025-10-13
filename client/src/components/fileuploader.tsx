@@ -5,7 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText, X } from "lucide-react";
 
-export default function FileUploader({ onFileUpload }: { onFileUpload: (file: File) => void }) {
+interface FileUploaderProps  {
+  onFileUpload: (file: File) => void,
+  isFileUploading: boolean
+}
+
+export default function FileUploader({ onFileUpload, isFileUploading }: FileUploaderProps ) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -46,8 +51,9 @@ export default function FileUploader({ onFileUpload }: { onFileUpload: (file: Fi
           <Input
             id="file"
             type="file"
-            className="absolute inset-0 h-full w-full opacity-0"
+            className="absolute inset-0 h-full w-full hidden"
             accept=".pdf,.doc,.docx,.txt"
+            disabled={isFileUploading}
             onChange={handleFileChange}
           />
         </label>
@@ -76,9 +82,10 @@ export default function FileUploader({ onFileUpload }: { onFileUpload: (file: Fi
 
           <Button
             onClick={handleSubmit}
+            disabled={isFileUploading}
             className="mt-4 w-full rounded-lg bg-black text-white hover:bg-neutral-800"
           >
-            Continue
+            {!isFileUploading ? 'Continue': 'Uploading the file...'}
           </Button>
         </div>
       )}
