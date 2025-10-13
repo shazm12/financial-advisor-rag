@@ -5,6 +5,8 @@ import FileUploader from "@/components/fileuploader";
 import ChatInterface from "@/components/chatinterface";
 import { Button } from "@/components/ui/button";
 import AnimatedText from "@/components/animatedtext";
+import { uploadDocToAPI } from "@/actions/upload-doc";
+import { toast } from "sonner";
 
 type Step = "upload" | "chat";
 
@@ -61,8 +63,16 @@ export default function Home() {
 
   }, []);
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
     setUploadedFile(file);
+    const response = await uploadDocToAPI(file);
+    if (response.success) {
+      toast.success(response.description || "File Upload Successful", { position: "bottom-right", duration: 4000 });
+    }
+    if (!response.success && response.error) {
+      toast.error(response.error || "Error in File Upload!", { position: "bottom-right", duration: 4000 });
+      return;
+    }
     gsap.to(".content-wrapper", {
       opacity: 0,
       y: -20,
@@ -102,11 +112,11 @@ export default function Home() {
         )}
 
         {currentStep === "chat" && uploadedFile && (
-          <div className="space-y-4">
-            <ChatInterface fileName={uploadedFile.name} />
+          <div className="space-y-2">
             <Button variant="outline" onClick={handleReset} className="w-full">
               Upload Different File
             </Button>
+            <ChatInterface fileName={uploadedFile.name} />
           </div>
         )}
       </div>
