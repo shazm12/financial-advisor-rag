@@ -16,6 +16,7 @@ export default function Home() {
   const subTitleRef = useRef<HTMLHeadingElement>(null);
   const [currentStep, setCurrentStep] = useState<Step>("upload");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
 
   useEffect(() => {
     gsap.fromTo(
@@ -65,14 +66,17 @@ export default function Home() {
 
   const handleFileUpload = async (file: File) => {
     setUploadedFile(file);
+    setIsFileUploading(true);
     const response = await uploadDocToAPI(file);
     if (response.success) {
       toast.success(response.description || "File Upload Successful", { position: "bottom-right", duration: 4000 });
     }
     if (!response.success && response.error) {
       toast.error(response.error || "Error in File Upload!", { position: "bottom-right", duration: 4000 });
+      setIsFileUploading(false);
       return;
     }
+    setIsFileUploading(false);
     gsap.to(".content-wrapper", {
       opacity: 0,
       y: -20,
@@ -108,9 +112,8 @@ export default function Home() {
 
       <div className="content-wrapper w-full flex justify-center">
         {currentStep === "upload" && (
-          <FileUploader onFileUpload={handleFileUpload} />
+          <FileUploader onFileUpload={handleFileUpload} isFileUploading={isFileUploading} />
         )}
-
         {currentStep === "chat" && uploadedFile && (
           <div className="space-y-2">
             <Button variant="outline" onClick={handleReset} className="w-full">
