@@ -86,6 +86,8 @@ export default function Home() {
         position: "bottom-right",
         duration: 4000,
       });
+      const sessionId = response?.sessionId;
+      localStorage.setItem("sessionId",sessionId);
     }
     if (!response.success && response.error) {
       toast.error(response.error || "Error in File Upload!", {
