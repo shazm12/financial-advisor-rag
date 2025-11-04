@@ -47,6 +47,8 @@ class QueryChain:
                     - Provide responses in a structured, easy-to-read format (use bullet points, categories, or tables if helpful).  
                     - Highlight key insights: spending categories, recurring charges, unusual expenses, or savings opportunities.  
                     - Offer actionable financial advice where relevant, but do not invent transactions not listed in the data.  
+                    - Also highlight any EMI spends and interest charged if found ONLY.
+                    - Give the report/answer in markdown format. 
 
                     Now, answer the following user question:  
                     {user_query}
