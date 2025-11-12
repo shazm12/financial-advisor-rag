@@ -35,8 +35,29 @@ export default function ChatInterface({ fileName }: { fileName: string }) {
         });
         return;
       }
-      const res = await queryChatbot(sessionId, userQuestion);
-      setResponse(res.answer);
+
+      const response = await fetch("/api/query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ session_id: sessionId, prompt: userQuestion }),
+      });
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      while(reader) {
+        const {done, value} = await reader.read();
+        if(done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter(line => line.startsWith('data: '));
+        lines.forEach(line => {
+          const content = line.substring(6);
+          setResponse(prev => prev + content)
+        });
+      }
+
     } catch (error) {
       toast.error("An error occurred. Please try again.", {
         position: "bottom-right",
