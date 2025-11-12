@@ -3,11 +3,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Bot } from "lucide-react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import { toast } from "sonner";
 
 export default function ChatInterface({ fileName }: { fileName: string }) {
   const [input, setInput] = useState("");
-  const [response, setResponse] = useState("");
+  const [output, setOutput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -16,7 +19,7 @@ export default function ChatInterface({ fileName }: { fileName: string }) {
     const userQuestion = input;
     setInput("");
     setIsLoading(true);
-    setResponse("");
+    setOutput("");
 
     try {
       const sessionId = localStorage.getItem("sessionId");
@@ -53,7 +56,7 @@ export default function ChatInterface({ fileName }: { fileName: string }) {
         const lines = chunk.split('\n').filter(line => line.startsWith('data: '));
         lines.forEach(line => {
           const content = line.substring(6);
-          setResponse(prev => prev + content)
+          setOutput(prev => prev + content);
         });
       }
 
@@ -62,11 +65,16 @@ export default function ChatInterface({ fileName }: { fileName: string }) {
         position: "bottom-right",
         duration: 4000,
       });
-      setResponse("Error Occurred!");
+      setOutput("Error Occurred!");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // if(output) {
+  //   console.log(output);
+  // }
+
 
   return (
     <div className="w-full max-h-1/4 max-w-2xl mx-auto p-6">
@@ -89,12 +97,9 @@ export default function ChatInterface({ fileName }: { fileName: string }) {
         </div>
       </form>
       {/* Response Display Area */}
-      {(response || isLoading) && (
+      {(output || isLoading) && (
         <div className="mt-4 p-4 bg-slate-50 rounded-lg border max-h-[50vh] overflow-y-auto">
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-              <Bot className="w-5 h-5 text-white" />
-            </div>
             <div className="flex-1">
               {isLoading ? (
                 <div className="space-y-2">
@@ -103,7 +108,13 @@ export default function ChatInterface({ fileName }: { fileName: string }) {
                   <div className="h-4 bg-slate-200 rounded animate-pulse w-5/6"></div>
                 </div>
               ) : (
-                <p className="text-slate-900">{response}</p>
+                <div>
+                  <Markdown 
+                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                  >
+                    {output}
+                  </Markdown>
+                </div>
               )}
             </div>
           </div>
