@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from app.models.request import QueryRequest
 from app.models.response import QueryResponse, Status
 from app.utils.dependencies import get_session_manager
-
+from fastapi.responses import StreamingResponse
 from app.utils.session_manager import SessionManager
 from app.utils.chains.query_chain import QueryChain
 
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/query", tags=["query"])
 async def query_document(
     request: QueryRequest,
     session_manager: Annotated[SessionManager, Depends(get_session_manager)],
-) -> QueryResponse:
+) -> StreamingResponse:
     """
     Query the extracted document using natural language
 
@@ -52,13 +52,9 @@ async def query_document(
             full_text_retriever=full_text_retreiver,
         )
 
-        answer = query_chain.invoke(request.prompt)
-
-        return QueryResponse(
-            status=Status.SUCCESS,
-            session_id=session_id,
-            response=answer,
-            description="Query executed successfully",
+        return StreamingResponse(
+            query_chain.generate_response(request.prompt),
+            media_type="text/event-stream"
         )
 
     except HTTPException:

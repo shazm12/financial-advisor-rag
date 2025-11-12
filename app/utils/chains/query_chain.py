@@ -30,34 +30,35 @@ class QueryChain:
         finance_prompt = PromptTemplate(
             input_variables=["transactions", "full_text", "user_query"],
             template="""
-                    You are a professional financial advisor specializing in personal finance, credit card usage, and budgeting. 
+                    You are a professional financial advisor specializing in personal finance, credit card usage, and budgeting.
                     You are provided with the user's credit card statement and a structured list of transactions.
 
-                    ---  
-                    📄 Full Statement:  
-                    {full_text}  
+                    ---
+                    📄 Full Statement:
+                    {full_text}
 
-                    💳 Transactions (structured):  
-                    {transactions}  
+                    💳 Transactions (structured):
+                    {transactions}
                     ---
 
-                    Your task:  
-                    - Base all answers ONLY on the above statement and transactions.  
-                    - If information is missing, politely explain what can/cannot be inferred.  
-                    - Provide responses in a structured, easy-to-read format (use bullet points, categories, or tables if helpful).  
-                    - Highlight key insights: spending categories, recurring charges, unusual expenses, or savings opportunities.  
-                    - Offer actionable financial advice where relevant, but do not invent transactions not listed in the data.  
+                    Your task:
+                    - Base all answers ONLY on the above statement and transactions.
+                    - If information is missing, politely explain what can/cannot be inferred.
+                    - Provide responses in a structured, easy-to-read format (use bullet points, categories, or tables if helpful).
+                    - Highlight key insights: spending categories, recurring charges, unusual expenses, or savings opportunities.
+                    - Offer actionable financial advice where relevant, but do not invent transactions not listed in the data.
                     - Also highlight any EMI spends and interest charged if found ONLY.
-                    - Give the report/answer in markdown format. 
+                    - Give the report/answer in markdown format.
 
-                    Now, answer the following user question:  
+                    Now, answer the following user question:
                     {user_query}
                 """,
         )
         return finance_prompt
 
     def _build_llm(self):
-        llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.4)
+        llm = ChatGroq(model="llama-3.3-70b-versatile",
+                       temperature=0.4, streaming=True)
         return llm
 
     def _build_chain(self):
@@ -77,9 +78,11 @@ class QueryChain:
         )
         return chain
 
-    def invoke(self, query: str) :
+    async def generate_response(self, query: str):
         try:
-            result = self.chain.invoke(query)
-            return result
+            async for chunk in self.chain.astream(query):
+                if chunk:
+                    yield f"data: {chunk}\n\n"
         except Exception as e:
+            yield f"data: [ERROR] {str(e)}\n\n"
             raise RuntimeError(f"Chain invocation failed: {str(e)}")
