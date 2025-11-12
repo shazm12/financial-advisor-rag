@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Bot } from "lucide-react";
-import { queryChatbot } from "@/actions/query-chatbot";
 import { toast } from "sonner";
 
 export default function ChatInterface({ fileName }: { fileName: string }) {
