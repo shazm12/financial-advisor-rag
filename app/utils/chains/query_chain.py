@@ -48,16 +48,42 @@ class QueryChain:
                     - Highlight key insights: spending categories, recurring charges, unusual expenses, or savings opportunities.
                     - Offer actionable financial advice where relevant, but do not invent transactions not listed in the data.
                     - Also highlight any EMI spends and interest charged if found ONLY.
-                    - Give the report/answer in markdown format.
+                    - Give the report/answer in a rich markdown format with proper line breaks and indentation.
+                    
+                    QUESTION: {user_query}
 
-                    Now, answer the following user question:
-                    {user_query}
+                    IMPORTANT OUTPUT RULES:
+                    - Start each section with ### followed by a space and title
+                    - Add blank line after each header
+                    - Add blank line before bullet lists
+                    - Add blank line after bullet lists
+                    - Use * for bullet points with a space after
+
+                    CRITICAL: You MUST format your response EXACTLY like this example. Add blank lines between sections.
+
+                    ### Section Name
+
+                    Explanation text here with proper spacing.
+
+                    #### Subsection
+
+                    * Point one
+                    * Point two
+                    * Point three
+
+                    Another paragraph here.
+
+                    ### Another Section
+
+                    More content here.
+
+                    Now answer the question. Remember: blank line after headers, blank line before lists, blank line after lists.
                 """,
         )
         return finance_prompt
 
     def _build_llm(self):
-        llm = ChatGroq(model="llama-3.3-70b-versatile",
+        llm = ChatGroq(model="openai/gpt-oss-120b",
                        temperature=0.4, streaming=True)
         return llm
 
